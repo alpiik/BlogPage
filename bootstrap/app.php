@@ -19,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
         // proxies here lets Laravel read those headers so it knows the
         // original request was secure.
         $middleware->trustProxies(at: '*');
+
+        $middleware->alias([
+            'admin' => \App\Http\Middleware\EnsureUserIsAdmin::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

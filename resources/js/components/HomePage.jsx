@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 
-function PostCard({ post, isOwner, csrfToken }) {
+function PostCard({ post, isOwner, csrfToken, isAdmin, currentUserId }) {
+    const canDelete = isOwner || isAdmin;
+    const canBan = isAdmin && post.authorId !== currentUserId;
     return (
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-3">
             <div className="flex items-start gap-3">
@@ -42,24 +44,48 @@ function PostCard({ post, isOwner, csrfToken }) {
                             className="mt-3 rounded-lg w-full max-h-[420px] object-contain bg-gray-50"
                         />
                     )}
-                    {isOwner && (
+                    {(canDelete || canBan) && (
                         <div className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100">
-                            <a
-                                href={`/edit-post/${post.id}`}
-                                className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
-                            >
-                                Edit
-                            </a>
-                            <form action={`/delete-post/${post.id}`} method="POST">
-                                <input type="hidden" name="_token" value={csrfToken} />
-                                <input type="hidden" name="_method" value="DELETE" />
-                                <button
-                                    type="submit"
-                                    className="text-xs font-medium text-red-500 hover:text-red-700"
+                            {isOwner && (
+                                <a
+                                    href={`/edit-post/${post.id}`}
+                                    className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
                                 >
-                                    Delete
-                                </button>
-                            </form>
+                                    Edit
+                                </a>
+                            )}
+                            {canDelete && (
+                                <form action={`/delete-post/${post.id}`} method="POST">
+                                    <input type="hidden" name="_token" value={csrfToken} />
+                                    <input type="hidden" name="_method" value="DELETE" />
+                                    <button
+                                        type="submit"
+                                        className="text-xs font-medium text-red-500 hover:text-red-700"
+                                    >
+                                        Delete
+                                    </button>
+                                </form>
+                            )}
+                            {canBan && (
+                                <form
+                                    action={`/admin/users/${post.authorId}`}
+                                    method="POST"
+                                    onSubmit={(e) => {
+                                        if (!window.confirm(`Permanently delete ${post.author}'s account and all their posts?`)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
+                                >
+                                    <input type="hidden" name="_token" value={csrfToken} />
+                                    <input type="hidden" name="_method" value="DELETE" />
+                                    <button
+                                        type="submit"
+                                        className="text-xs font-medium text-red-700 hover:text-red-900"
+                                    >
+                                        Ban author
+                                    </button>
+                                </form>
+                            )}
                         </div>
                     )}
                 </div>
@@ -68,7 +94,7 @@ function PostCard({ post, isOwner, csrfToken }) {
     );
 }
 
-export default function HomePage({ username, avatarUrl, allPosts, myPosts, csrfToken, errors = {}, old = {} }) {
+export default function HomePage({ username, userId, isAdmin = false, avatarUrl, allPosts, myPosts, csrfToken, errors = {}, old = {} }) {
     const [activeTab, setActiveTab] = useState('public');
 
     return (
@@ -200,14 +226,28 @@ export default function HomePage({ username, avatarUrl, allPosts, myPosts, csrfT
                             <p className="text-sm text-gray-400">No public posts yet.</p>
                         ) : (
                             allPosts.map((post) => (
-                                <PostCard key={post.id} post={post} isOwner={false} csrfToken={csrfToken} />
+                                <PostCard
+                                    key={post.id}
+                                    post={post}
+                                    isOwner={post.authorId === userId}
+                                    csrfToken={csrfToken}
+                                    isAdmin={isAdmin}
+                                    currentUserId={userId}
+                                />
                             ))
                         )
                     ) : myPosts.length === 0 ? (
                         <p className="text-sm text-gray-400">You haven't posted anything yet.</p>
                     ) : (
                         myPosts.map((post) => (
-                            <PostCard key={post.id} post={post} isOwner={true} csrfToken={csrfToken} />
+                            <PostCard
+                                key={post.id}
+                                post={post}
+                                isOwner={true}
+                                csrfToken={csrfToken}
+                                isAdmin={isAdmin}
+                                currentUserId={userId}
+                            />
                         ))
                     )}
                 </section>

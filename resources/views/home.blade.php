@@ -15,6 +15,7 @@
             'body'         => $p->body,
             'image'        => $p->image ? asset('storage/' . $p->image) : null,
             'author'       => $p->user->name,
+            'authorId'     => $p->user->id,
             'authorAvatar' => $p->user->avatar_url,
             'postedAt'     => $p->created_at->diffForHumans(),
             'edited'       => $p->updated_at->gt($p->created_at->addSecond()),
@@ -25,6 +26,7 @@
             'body'         => $p->body,
             'image'        => $p->image ? asset('storage/' . $p->image) : null,
             'author'       => $p->user->name,
+            'authorId'     => $p->user->id,
             'authorAvatar' => $p->user->avatar_url,
             'is_private'   => (bool) $p->is_private,
             'postedAt'     => $p->created_at->diffForHumans(),
@@ -32,6 +34,8 @@
         ]);
         $authProps = json_encode([
             'username'   => auth()->user()->name,
+            'userId'     => auth()->id(),
+            'isAdmin'    => (bool) auth()->user()->is_admin,
             'avatarUrl'  => auth()->user()->avatar_url,
             'allPosts'   => $allPostsData,
             'myPosts'    => $myPostsData,

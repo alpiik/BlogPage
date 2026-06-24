@@ -34,4 +34,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/edit-post/{post}', [PostController::class, 'editPost']);
     Route::put('/edit-post/{post}', [PostController::class, 'updatePost']);
     Route::delete('/delete-post/{post}', [PostController::class, 'deletePost']);
+
+    Route::middleware('admin')->group(function () {
+        Route::delete('/admin/users/{user}', [UserController::class, 'destroyUser']);
+    });
 });

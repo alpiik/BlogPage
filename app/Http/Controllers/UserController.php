@@ -133,4 +133,33 @@ class UserController extends Controller
 
         return redirect('/profile')->with('message', 'Profile updated.');
     }
+
+    /**
+     * Admin-only: permanently remove another user's account, along with
+     * their posts and uploaded files. Used for moderating abusive accounts
+     * rather than just deleting one-off posts.
+     */
+    public function destroyUser(User $user) {
+        if ($user->id === auth()->id()) {
+            // Don't let an admin delete their own account through this
+            // action by accident; account deletion isn't something we
+            // support for yourself here.
+            return back();
+        }
+
+        foreach ($user->userposts as $post) {
+            if ($post->image) {
+                \Storage::disk('public')->delete($post->image);
+            }
+            $post->delete();
+        }
+
+        if ($user->avatar) {
+            \Storage::disk('public')->delete($user->avatar);
+        }
+
+        $user->delete();
+
+        return redirect('/');
+    }
 }
