@@ -22,14 +22,20 @@ class PostController extends Controller {
                 return redirect('/');
         }
 
+        $keepingExistingImage = $post->image && !$request->boolean('remove_image') && !$request->hasFile('image');
+
         $incomingFields = $request->validate([
-            'title' => 'required',
-            'body' => 'required',
+            'title' => 'required|max:100',
+            'body' => ($keepingExistingImage ? 'nullable' : 'required_without:image') . '|max:2000',
             'image' => 'nullable|image|max:4096'
+        ], [
+            'body.required_without' => 'Please add a description or a picture.',
+            'title.max' => 'Title can\'t be longer than 100 characters.',
+            'body.max' => 'Post can\'t be longer than 2000 characters.',
         ]);
 
         $incomingFields['title'] = strip_tags($incomingFields['title']);
-        $incomingFields['body'] = strip_tags($incomingFields['body']);
+        $incomingFields['body'] = isset($incomingFields['body']) ? strip_tags($incomingFields['body']) : '';
         $incomingFields['is_private'] = $request->boolean('is_private');
 
         if ($request->hasFile('image')) {
@@ -57,13 +63,17 @@ class PostController extends Controller {
 
     public function createPost(Request $request) {
         $incomingFields = $request->validate([
-            'title' => 'required',
-            'body' => 'required',
+            'title' => 'required|max:100',
+            'body' => 'required_without:image|max:2000',
             'image' => 'nullable|image|max:4096'
+        ], [
+            'body.required_without' => 'Please add a description or a picture.',
+            'title.max' => 'Title can\'t be longer than 100 characters.',
+            'body.max' => 'Post can\'t be longer than 2000 characters.',
         ]);
 
         $incomingFields['title'] = strip_tags($incomingFields['title']);
-        $incomingFields['body'] = strip_tags($incomingFields['body']);
+        $incomingFields['body'] = isset($incomingFields['body']) ? strip_tags($incomingFields['body']) : '';
         $incomingFields['user_id'] = auth()->id();
         $incomingFields['is_private'] = $request->boolean('is_private');
 
