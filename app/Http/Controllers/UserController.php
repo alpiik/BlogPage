@@ -106,6 +106,11 @@ class UserController extends Controller
                 \Storage::disk('public')->delete($user->avatar);
             }
             $user->avatar = $request->file('avatar')->store('avatars', 'public');
+        } elseif ($request->input('remove_avatar') === '1' && $user->avatar) {
+            // No new file was uploaded, but the user asked to clear their
+            // existing custom avatar and fall back to the shared default.
+            \Storage::disk('public')->delete($user->avatar);
+            $user->avatar = null;
         }
 
         if (!empty($incomingFields['new_password'])) {

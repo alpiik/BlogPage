@@ -10,9 +10,10 @@
     @php
         $profileProps = json_encode([
             'user' => [
-                'name'      => old('name', $user->name),
-                'email'     => $user->email,
-                'avatarUrl' => $user->avatar_url,
+                'name'            => old('name', $user->name),
+                'email'           => $user->email,
+                'avatarUrl'       => $user->avatar_url,
+                'hasCustomAvatar' => (bool) $user->avatar,
             ],
             'csrfToken' => csrf_token(),
             'message'   => session('message'),

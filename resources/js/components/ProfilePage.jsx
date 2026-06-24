@@ -2,12 +2,21 @@ import React, { useState } from 'react';
 
 export default function ProfilePage({ user, csrfToken, message, errors = {} }) {
     const [preview, setPreview] = useState(user.avatarUrl);
+    const [hasCustomAvatar, setHasCustomAvatar] = useState(user.hasCustomAvatar);
+    const [removeAvatar, setRemoveAvatar] = useState(false);
 
     function handleAvatarChange(e) {
         const file = e.target.files?.[0];
         if (file) {
             setPreview(URL.createObjectURL(file));
+            setRemoveAvatar(false);
         }
+    }
+
+    function handleRemoveAvatar() {
+        setPreview('/images/default-avatar.svg');
+        setHasCustomAvatar(false);
+        setRemoveAvatar(true);
     }
 
     return (
@@ -37,6 +46,7 @@ export default function ProfilePage({ user, csrfToken, message, errors = {} }) {
                         className="space-y-5"
                     >
                         <input type="hidden" name="_token" value={csrfToken} />
+                        <input type="hidden" name="remove_avatar" value={removeAvatar ? '1' : '0'} />
 
                         {/* Avatar */}
                         <div className="flex items-center gap-4">
@@ -46,16 +56,27 @@ export default function ProfilePage({ user, csrfToken, message, errors = {} }) {
                                 className="w-16 h-16 rounded-full object-cover border border-gray-200"
                             />
                             <div>
-                                <label className="text-xs font-medium text-indigo-600 hover:text-indigo-800 cursor-pointer">
-                                    Change picture
-                                    <input
-                                        type="file"
-                                        name="avatar"
-                                        accept="image/*"
-                                        onChange={handleAvatarChange}
-                                        className="hidden"
-                                    />
-                                </label>
+                                <div className="flex items-center gap-3">
+                                    <label className="text-xs font-medium text-indigo-600 hover:text-indigo-800 cursor-pointer">
+                                        Change picture
+                                        <input
+                                            type="file"
+                                            name="avatar"
+                                            accept="image/*"
+                                            onChange={handleAvatarChange}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                    {hasCustomAvatar && (
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveAvatar}
+                                            className="text-xs font-medium text-indigo-600 hover:text-indigo-800 cursor-pointer"
+                                        >
+                                            Remove picture
+                                        </button>
+                                    )}
+                                </div>
                                 {errors.avatar && (
                                     <p className="text-xs text-red-500 mt-1">{errors.avatar}</p>
                                 )}
