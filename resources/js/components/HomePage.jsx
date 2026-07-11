@@ -127,14 +127,8 @@ export default function HomePage({ username, userId, isAdmin = false, isGuest = 
             <main className="max-w-2xl mx-auto px-4 py-6 space-y-8">
                 {/* Guest banner */}
                 {isGuest && (
-                    <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
-                        <p className="text-sm text-amber-800">You're browsing as a guest — posts are read-only.</p>
-                        <form action="/logout" method="POST" className="shrink-0">
-                            <input type="hidden" name="_token" value={csrfToken} />
-                            <button type="submit" className="text-xs font-medium text-amber-700 hover:text-amber-900">
-                                Sign out
-                            </button>
-                        </form>
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
+                        <p className="text-sm text-amber-800">You're browsing as a guest - posts are read-only.</p>
                     </div>
                 )}
 
