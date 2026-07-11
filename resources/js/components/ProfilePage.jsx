@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function ProfilePage({ user, csrfToken, message, errors = {} }) {
+export default function ProfilePage({ user, isGuest = false, csrfToken, message, errors = {} }) {
     const [preview, setPreview] = useState(user.avatarUrl);
     const [hasCustomAvatar, setHasCustomAvatar] = useState(user.hasCustomAvatar);
     const [removeAvatar, setRemoveAvatar] = useState(false);
@@ -17,6 +17,41 @@ export default function ProfilePage({ user, csrfToken, message, errors = {} }) {
         setPreview('/images/default-avatar.svg');
         setHasCustomAvatar(false);
         setRemoveAvatar(true);
+    }
+
+    if (isGuest) {
+        return (
+            <div className="min-h-screen bg-gray-50 font-sans">
+                <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+                    <div className="max-w-lg mx-auto px-4 h-14 flex items-center gap-3">
+                        <a href="/" className="text-sm text-gray-500 hover:text-gray-800 transition-colors">
+                            ← Back
+                        </a>
+                        <span className="text-gray-300">/</span>
+                        <span className="text-sm font-semibold text-gray-800">Profile</span>
+                    </div>
+                </header>
+                <main className="max-w-lg mx-auto px-4 py-6">
+                    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col items-center text-center gap-4">
+                        <img
+                            src={user.avatarUrl}
+                            alt="Guest"
+                            className="w-16 h-16 rounded-full object-cover border border-gray-200"
+                        />
+                        <div>
+                            <p className="font-semibold text-gray-800">Guest</p>
+                            <p className="text-sm text-gray-400 mt-1">You're browsing as a guest.</p>
+                        </div>
+                        <a
+                            href="/"
+                            className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                        >
+                            Register for an account to post and customise your profile →
+                        </a>
+                    </div>
+                </main>
+            </div>
+        );
     }
 
     return (

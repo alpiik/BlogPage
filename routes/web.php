@@ -20,6 +20,7 @@ Route::get('/', function () {
 // Throttled to 6 attempts per minute per IP to slow down brute-force/credential-stuffing attempts.
 Route::post('/register', [UserController::class, 'register'])->middleware('throttle:6,1');
 Route::post('/login', [UserController::class, 'login'])->middleware('throttle:6,1');
+Route::post('/guest-login', [UserController::class, 'guestLogin'])->middleware('throttle:20,1');
 
 // Routes below require an authenticated user. If the session is missing or
 // expired, Laravel redirects to '/' instead of letting the request crash

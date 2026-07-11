@@ -73,8 +73,24 @@ class UserController extends Controller
         return view('profile', ['user' => auth()->user()]);
     }
 
+    public function guestLogin(Request $request) {
+        $guest = User::where('email', 'guest@guest.internal')->where('is_guest', true)->first();
+
+        if (! $guest) {
+            return back()->withErrors(['loginpassword' => 'Guest account not set up yet. Ask the admin to run php artisan guest:create.']);
+        }
+
+        auth()->login($guest);
+        $request->session()->regenerate();
+        return redirect('/');
+    }
+
     public function updateProfile(Request $request) {
         $user = auth()->user();
+
+        if ($user->is_guest) {
+            return redirect('/profile');
+        }
 
         // If a file was sent but PHP itself rejected/lost it (bad tmp dir,
         // disk full, permissions, etc.), the validation rule below fails
@@ -91,7 +107,7 @@ class UserController extends Controller
             // Laravel's "image" rule doesn't recognize AVIF (a format some
             // browsers/tools save under a .jpg name), so we list mime types
             // explicitly instead, with avif included.
-            'avatar' => 'nullable|file|mimes:jpg,jpeg,png,bmp,gif,svg,webp,avif|max:4096',
+            'avatar' => 'nullable|file|mimes:jpg,jpeg,png,bmp,gif,webp,avif|max:4096',
             'current_password' => ['nullable', 'required_with:new_password'],
             'new_password' => ['nullable', 'min:8', 'max:255'],
         ], [

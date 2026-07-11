@@ -36,6 +36,7 @@
             'username'   => auth()->user()->name,
             'userId'     => auth()->id(),
             'isAdmin'    => (bool) auth()->user()->is_admin,
+            'isGuest'    => (bool) auth()->user()->is_guest,
             'avatarUrl'  => auth()->user()->avatar_url,
             'allPosts'   => $allPostsData,
             'myPosts'    => $myPostsData,

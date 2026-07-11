@@ -65,6 +65,9 @@ class PostController extends Controller {
     }
 
     public function createPost(Request $request) {
+        if (auth()->user()->is_guest) {
+            return redirect('/');
+        }
         $incomingFields = $request->validate([
             'title' => 'required|max:100',
             'body' => 'required_without:image|max:2000',

@@ -15,6 +15,7 @@
                 'avatarUrl'       => $user->avatar_url,
                 'hasCustomAvatar' => (bool) $user->avatar,
             ],
+            'isGuest'   => (bool) $user->is_guest,
             'csrfToken' => csrf_token(),
             'message'   => session('message'),
             'errors'    => [

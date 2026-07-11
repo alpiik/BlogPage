@@ -74,6 +74,19 @@ export default function GuestPage({ csrfToken, errors = {}, old = {} }) {
                         </button>
                     </form>
                 </div>
+
+                <div className="text-center">
+                    <p className="text-xs text-gray-400 mb-2">Just want to have a look?</p>
+                    <form action="/guest-login" method="POST" onSubmit={preventDoubleSubmit}>
+                        <input type="hidden" name="_token" value={csrfToken} />
+                        <button
+                            type="submit"
+                            className="text-sm text-gray-500 hover:text-gray-800 underline underline-offset-2 transition-colors"
+                        >
+                            Continue as guest
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );

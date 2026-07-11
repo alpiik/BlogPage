@@ -94,7 +94,7 @@ function PostCard({ post, isOwner, csrfToken, isAdmin, currentUserId }) {
     );
 }
 
-export default function HomePage({ username, userId, isAdmin = false, avatarUrl, allPosts, myPosts, csrfToken, errors = {}, old = {} }) {
+export default function HomePage({ username, userId, isAdmin = false, isGuest = false, avatarUrl, allPosts, myPosts, csrfToken, errors = {}, old = {} }) {
     const [activeTab, setActiveTab] = useState('public');
 
     return (
@@ -125,8 +125,21 @@ export default function HomePage({ username, userId, isAdmin = false, avatarUrl,
             </header>
 
             <main className="max-w-2xl mx-auto px-4 py-6 space-y-8">
+                {/* Guest banner */}
+                {isGuest && (
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+                        <p className="text-sm text-amber-800">You're browsing as a guest — posts are read-only.</p>
+                        <form action="/logout" method="POST" className="shrink-0">
+                            <input type="hidden" name="_token" value={csrfToken} />
+                            <button type="submit" className="text-xs font-medium text-amber-700 hover:text-amber-900">
+                                Sign out
+                            </button>
+                        </form>
+                    </div>
+                )}
+
                 {/* Create post */}
-                <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+                {!isGuest && <section className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
                     <h2 className="text-sm font-semibold text-gray-700 mb-4">New Post</h2>
                     <form action="/create-post" method="POST" encType="multipart/form-data" className="space-y-3">
                         <input type="hidden" name="_token" value={csrfToken} />
@@ -192,34 +205,36 @@ export default function HomePage({ username, userId, isAdmin = false, avatarUrl,
                             </button>
                         </div>
                     </form>
-                </section>
+                </section>}
 
                 {/* Public / Your posts toggle */}
                 <section>
-                    <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-4 w-fit">
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('public')}
-                            className={`text-sm px-4 py-1.5 rounded-md font-medium transition-colors ${
-                                activeTab === 'public'
-                                    ? 'bg-white text-gray-900 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                        >
-                            Public Posts
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveTab('mine')}
-                            className={`text-sm px-4 py-1.5 rounded-md font-medium transition-colors ${
-                                activeTab === 'mine'
-                                    ? 'bg-white text-gray-900 shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                        >
-                            Your Posts
-                        </button>
-                    </div>
+                    {!isGuest && (
+                        <div className="flex gap-1 bg-gray-100 rounded-lg p-1 mb-4 w-fit">
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('public')}
+                                className={`text-sm px-4 py-1.5 rounded-md font-medium transition-colors ${
+                                    activeTab === 'public'
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                            >
+                                Public Posts
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setActiveTab('mine')}
+                                className={`text-sm px-4 py-1.5 rounded-md font-medium transition-colors ${
+                                    activeTab === 'mine'
+                                        ? 'bg-white text-gray-900 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                            >
+                                Your Posts
+                            </button>
+                        </div>
+                    )}
 
                     {activeTab === 'public' ? (
                         allPosts.length === 0 ? (
